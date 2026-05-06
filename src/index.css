@@ -1,0 +1,48 @@
+@import "tailwindcss";
+
+@theme {
+
+
+    --color-space-950: #070B14;
+    /* deepest background */
+    --color-space-900: #0B0F1A;
+    /* main app background */
+    --color-surface-800: #12182B;
+    /* navbar/cards */
+    --color-surface-700: #1A2238;
+    /* hover surfaces */
+
+
+    --color-portal-500: #00FFB2;
+    /* main portal glow */
+    --color-portal-400: #1AFFC9;
+    /* softer glow */
+    --color-portal-600: #00CC8E;
+    /* darker neon */
+
+
+    --color-toxic-500: #39FF14;
+    --color-toxic-600: #2ECC10;
+
+
+    --color-cyan-portal-500: #00E5FF;
+    --color-cyan-portal-600: #00B8CC;
+
+
+    --color-alien-500: #A855F7;
+    --color-alien-600: #7E22CE;
+
+
+    --color-status-alive: #22C55E;
+    --color-status-dead: #EF4444;
+    --color-status-unknown: #94A3B8;
+
+
+    --color-text-primary: #E2E8F0;
+    --color-text-muted: #94A3B8;
+
+
+    --shadow-portal-glow: 0 0 12px #00FFB2;
+    --shadow-alien-glow: 0 0 12px #A855F7;
+
+}
