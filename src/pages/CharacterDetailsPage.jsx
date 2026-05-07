@@ -9,6 +9,11 @@ import {
   FaChevronDown,
   FaChevronUp,
 } from "react-icons/fa";
+import {
+  showErrorToast,
+  showSuccessToast,
+  showRateLimitToast,
+} from "../utils/toastHelpers.js";
 
 function CharacterDetailPage() {
   const { id } = useParams();
@@ -19,10 +24,12 @@ function CharacterDetailPage() {
   const [isFavorite, setIsFavorite] = useState(false);
   const [showAllEpisodes, setShowAllEpisodes] = useState(false);
   const [episodesToShow, setEpisodesToShow] = useState(10);
+
   useEffect(() => {
     const favorites = JSON.parse(localStorage.getItem("favorites") || "[]");
     setIsFavorite(favorites.includes(parseInt(id)));
   }, [id]);
+
   useEffect(() => {
     async function fetchCharacterDetails() {
       setIsLoading(true);
@@ -31,40 +38,77 @@ function CharacterDetailPage() {
           `https://rickandmortyapi.com/api/character/${id}`,
         );
         setCharacter(characterRes.data);
+
         const episodeUrls = characterRes.data.episode;
         const episodePromises = episodeUrls.map((url) => axios.get(url));
         const episodeResponses = await Promise.all(episodePromises);
         setEpisodes(episodeResponses.map((res) => res.data));
+
         if (episodeUrls.length <= 10) {
           setEpisodesToShow(episodeUrls.length);
         }
       } catch (err) {
         console.error("Error fetching character details:", err);
+
+        if (err.response?.status === 429) {
+          showRateLimitToast(() => {
+            // Auto retry
+            fetchCharacterDetails();
+          });
+        } else {
+          showErrorToast(err);
+        }
       } finally {
         setIsLoading(false);
       }
     }
     fetchCharacterDetails();
   }, [id]);
+
   const toggleFavorite = () => {
+    // Guard clause - if character doesn't exist, don't try to favorite
+    if (!character) return;
+
     const favorites = JSON.parse(localStorage.getItem("favorites") || "[]");
     let newFavorites;
-    if (favorites.includes(character.id)) {
+    const wasFavorite = favorites.includes(character.id);
+
+    if (wasFavorite) {
       newFavorites = favorites.filter((favId) => favId !== character.id);
+      showSuccessToast("💔 Removed from favorites");
     } else {
       newFavorites = [...favorites, character.id];
+      showSuccessToast("⭐ Added to favorites!");
     }
+
     localStorage.setItem("favorites", JSON.stringify(newFavorites));
     setIsFavorite(!isFavorite);
     window.dispatchEvent(new Event("favoritesUpdated"));
   };
+
   if (isLoading) return <Loading fullScreen />;
   if (!character)
-    return <div className="text-center py-20">Character not found</div>;
+    return (
+      <div className="min-h-screen bg-surface-900">
+        <div className="max-w-7xl mx-auto px-6 py-10">
+          <button
+            onClick={() => navigate(-1)}
+            className="flex items-center gap-2 text-text-muted hover:text-portal-500 transition mb-6"
+          >
+            <FaArrowLeft /> Back to Characters
+          </button>
+          <div className="text-center py-20 text-text-muted">
+            Character not found in this dimension! 🔍
+          </div>
+        </div>
+      </div>
+    );
+
   const displayedEpisodes = showAllEpisodes
     ? episodes
     : episodes.slice(0, episodesToShow);
   const hasMoreEpisodes = episodes.length > episodesToShow;
+
   return (
     <div className="min-h-screen bg-surface-900">
       <div className="max-w-7xl mx-auto px-6 py-10">
@@ -93,7 +137,13 @@ function CharacterDetailPage() {
                   </h1>
                   <div className="flex items-center gap-2 mb-4">
                     <span
-                      className={`w-3 h-3 rounded-full ${character.status === "Alive" ? "bg-status-alive" : character.status === "Dead" ? "bg-status-dead" : "bg-status-unknown"}`}
+                      className={`w-3 h-3 rounded-full ${
+                        character.status === "Alive"
+                          ? "bg-status-alive"
+                          : character.status === "Dead"
+                            ? "bg-status-dead"
+                            : "bg-status-unknown"
+                      }`}
                     ></span>
                     <span className="text-text-muted">
                       {character.status} — {character.species}
@@ -194,4 +244,5 @@ function CharacterDetailPage() {
     </div>
   );
 }
+
 export default CharacterDetailPage;

@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { FaHeart, FaRegHeart } from "react-icons/fa";
+import { showSuccessToast } from "../utils/toastHelpers.js"; // ADD THIS
 
 function CharacterList({ characters, onFavoriteToggle, favorites }) {
   const toggleFavorite = (e, characterId) => {
@@ -7,14 +8,17 @@ function CharacterList({ characters, onFavoriteToggle, favorites }) {
     e.stopPropagation();
 
     let newFavorites;
-    if (favorites.includes(characterId)) {
+    const wasFavorite = favorites.includes(characterId);
+
+    if (wasFavorite) {
       newFavorites = favorites.filter((id) => id !== characterId);
+      showSuccessToast("💔 Removed from favorites");
     } else {
       newFavorites = [...favorites, characterId];
+      showSuccessToast("⭐ Added to favorites!");
     }
 
     localStorage.setItem("favorites", JSON.stringify(newFavorites));
-
     window.dispatchEvent(new Event("favoritesUpdated"));
 
     if (onFavoriteToggle) {
@@ -39,8 +43,6 @@ function CharacterList({ characters, onFavoriteToggle, favorites }) {
                     className="w-full h-52 object-cover transition-transform duration-500
                               group-hover:scale-110"
                   />
-
-                  {/* Favorite Button on Card */}
                   <button
                     onClick={(e) => toggleFavorite(e, item.id)}
                     className="absolute top-3 right-3 z-10 bg-black/50 backdrop-blur-sm p-2 rounded-full
@@ -53,12 +55,8 @@ function CharacterList({ characters, onFavoriteToggle, favorites }) {
                     )}
                   </button>
                 </div>
-
                 <div className="p-5">
-                  <h2
-                    className="text-lg font-semibold text-text-primary transition-colors duration-300
-                              group-hover:text-portal-400"
-                  >
+                  <h2 className="text-lg font-semibold text-text-primary transition-colors duration-300 group-hover:text-portal-400">
                     {item.name}
                   </h2>
                   <div className="flex items-center gap-2 mt-3">
