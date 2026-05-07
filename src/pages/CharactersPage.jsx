@@ -137,7 +137,7 @@ function CharactersPage({ searchQuery }) {
               searchQuery.length >= 3
             ) {
               hasShown404Toast.current = true;
-              showInfoToast("🔍 No characters found in this dimension");
+              showInfoToast("No characters found in this dimension");
             }
           } else {
             showErrorToast(err);
@@ -189,7 +189,7 @@ function CharactersPage({ searchQuery }) {
             ? "No favorite characters yet. ❤️ Click the heart on any character to add them!"
             : searchQuery && searchQuery.length > 0 && searchQuery.length < 3
               ? "🔍 Enter at least 3 characters to search"
-              : "No characters found in this dimension! 🔍"}
+              : "No characters found in this dimension!"}
         </div>
       ) : (
         <>
