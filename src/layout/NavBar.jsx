@@ -1,25 +1,44 @@
 import { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { HiMenu, HiX } from "react-icons/hi";
 
 function NavBar({ searchQuery, setSearchQuery }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
 
   const isActive = (path) => location.pathname === path;
+
+  const handleNavigationToCharacters = () => {
+    // Clear search when navigating to characters page
+    setSearchQuery("");
+
+    // If already on characters page, force a refresh by navigating to a dummy route and back
+    if (location.pathname === "/" || location.pathname === "/characters") {
+      // Dispatch a custom event to let CharactersPage know to reset filters
+      window.dispatchEvent(new CustomEvent("resetCharactersFilters"));
+    }
+
+    // Navigate to characters page
+    navigate("/characters");
+    setMenuOpen(false);
+  };
 
   return (
     <nav className="bg-space-900 border-b border-surface-700 shadow-lg relative">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center gap-8 flex-1">
-            <Link to="/">
+            <button
+              onClick={handleNavigationToCharacters}
+              className="cursor-pointer focus:outline-none"
+            >
               <img
                 src="https://upload.wikimedia.org/wikipedia/commons/b/b1/Rick_and_Morty.svg"
                 alt="Rick & Morty"
-                className="h-10 w-auto hidden xs:block sm:block cursor-pointer hover:opacity-80 transition"
+                className="h-10 w-auto hidden xs:block sm:block hover:opacity-80 transition"
               />
-            </Link>
+            </button>
 
             {location.pathname === "/" ||
             location.pathname === "/characters" ? (
@@ -39,16 +58,16 @@ function NavBar({ searchQuery, setSearchQuery }) {
 
           <div className="flex items-center gap-4">
             <div className="hidden md:flex gap-6 mx-4">
-              <Link
-                to="/characters"
-                className={`transition-colors ${
+              <button
+                onClick={handleNavigationToCharacters}
+                className={`transition-colors cursor-pointer ${
                   isActive("/characters") || isActive("/")
                     ? "text-portal-500"
                     : "text-text-muted hover:text-portal-500"
                 }`}
               >
                 Characters
-              </Link>
+              </button>
               <Link
                 to="/episodes"
                 className={`transition-colors ${
@@ -86,17 +105,16 @@ function NavBar({ searchQuery, setSearchQuery }) {
       {menuOpen && (
         <div className="md:hidden bg-surface-800 absolute top-16 left-0 w-full shadow-lg z-20">
           <div className="flex flex-col p-4 gap-4">
-            <Link
-              to="/characters"
-              onClick={() => setMenuOpen(false)}
-              className={`transition ${
+            <button
+              onClick={handleNavigationToCharacters}
+              className={`transition text-left cursor-pointer ${
                 isActive("/characters") || isActive("/")
                   ? "text-portal-500"
                   : "text-text-primary hover:text-portal-500"
               }`}
             >
               Characters
-            </Link>
+            </button>
             <Link
               to="/episodes"
               onClick={() => setMenuOpen(false)}

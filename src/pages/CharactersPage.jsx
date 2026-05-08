@@ -8,8 +8,7 @@ import {
   showRateLimitToast,
   showInfoToast,
 } from "../utils/toastHelpers.js";
-
-function CharactersPage({ searchQuery }) {
+function CharactersPage({ searchQuery, setSearchQuery }) {
   const [characters, setCharacters] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [page, setPage] = useState(1);
@@ -19,20 +18,16 @@ function CharactersPage({ searchQuery }) {
   const [showFavorites, setShowFavorites] = useState(false);
   const [favorites, setFavorites] = useState([]);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
-
   const hasShown404Toast = useRef(false);
   const debounceTimer = useRef(null);
-
   const loadFavorites = () => {
     const favs = JSON.parse(localStorage.getItem("favorites") || "[]");
     setFavorites(favs);
     return favs;
   };
-
   useEffect(() => {
     loadFavorites();
   }, []);
-
   useEffect(() => {
     const handleFavoritesUpdate = () => {
       const updatedFavs = JSON.parse(localStorage.getItem("favorites") || "[]");
@@ -46,27 +41,22 @@ function CharactersPage({ searchQuery }) {
       window.removeEventListener("favoritesUpdated", handleFavoritesUpdate);
     };
   }, [showFavorites]);
-
   useEffect(() => {
     setPage(1);
     hasShown404Toast.current = false;
   }, [searchQuery, statusFilter, speciesFilter, showFavorites]);
-
   useEffect(() => {
     if (searchQuery && searchQuery.length > 0 && searchQuery.length < 3) {
       setCharacters([]);
       setIsLoading(false);
       return;
     }
-
     if (debounceTimer.current) {
       clearTimeout(debounceTimer.current);
     }
-
     debounceTimer.current = setTimeout(() => {
       async function fetchCharacters() {
         setIsLoading(true);
-
         try {
           if (showFavorites) {
             const currentFavorites = JSON.parse(
@@ -78,13 +68,11 @@ function CharactersPage({ searchQuery }) {
               setIsLoading(false);
               return;
             }
-
             const favoritePromises = currentFavorites.map((id) =>
               axios.get(`https://rickandmortyapi.com/api/character/${id}`),
             );
             const responses = await Promise.all(favoritePromises);
             let favCharacters = responses.map((res) => res.data);
-
             if (searchQuery) {
               favCharacters = favCharacters.filter((char) =>
                 char.name.toLowerCase().includes(searchQuery.toLowerCase()),
@@ -112,7 +100,6 @@ function CharactersPage({ searchQuery }) {
               params.append("status", statusFilter.toLowerCase());
             if (speciesFilter)
               params.append("species", speciesFilter.toLowerCase());
-
             const res = await axios.get(
               `https://rickandmortyapi.com/api/character?${params.toString()}`,
             );
@@ -122,7 +109,6 @@ function CharactersPage({ searchQuery }) {
           }
         } catch (err) {
           console.error("Error fetching characters:", err);
-
           if (err.response?.status === 429) {
             showRateLimitToast(() => {
               setRefreshTrigger((prev) => prev + 1);
@@ -130,7 +116,6 @@ function CharactersPage({ searchQuery }) {
           } else if (err.response?.status === 404) {
             setCharacters([]);
             setTotalPages(1);
-
             if (
               !hasShown404Toast.current &&
               searchQuery &&
@@ -146,10 +131,8 @@ function CharactersPage({ searchQuery }) {
           setIsLoading(false);
         }
       }
-
       fetchCharacters();
     }, 500);
-
     return () => {
       if (debounceTimer.current) {
         clearTimeout(debounceTimer.current);
@@ -163,15 +146,25 @@ function CharactersPage({ searchQuery }) {
     showFavorites,
     refreshTrigger,
   ]);
-
+  useEffect(() => {
+    const handleResetFilters = () => {
+      setStatusFilter("");
+      setSpeciesFilter("");
+      setShowFavorites(false);
+      setSearchQuery("");
+      setPage(1);
+    };
+    window.addEventListener("resetCharactersFilters", handleResetFilters);
+    return () => {
+      window.removeEventListener("resetCharactersFilters", handleResetFilters);
+    };
+  }, [setSearchQuery]);
   const handleFavoriteToggle = (newFavorites) => {
     setFavorites(newFavorites);
   };
-
   if (isLoading) {
     return <Loading fullScreen={true} />;
   }
-
   return (
     <div className="bg-surface-900 min-h-screen">
       <FilterBar
@@ -224,5 +217,4 @@ function CharactersPage({ searchQuery }) {
     </div>
   );
 }
-
 export default CharactersPage;

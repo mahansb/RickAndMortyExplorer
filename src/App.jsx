@@ -23,11 +23,21 @@ function App() {
       <Routes>
         <Route
           path="/"
-          element={<CharactersPage searchQuery={searchQuery} />}
+          element={
+            <CharactersPage
+              searchQuery={searchQuery}
+              setSearchQuery={setSearchQuery}
+            />
+          }
         />
         <Route
           path="/characters"
-          element={<CharactersPage searchQuery={searchQuery} />}
+          element={
+            <CharactersPage
+              searchQuery={searchQuery}
+              setSearchQuery={setSearchQuery}
+            />
+          }
         />
         <Route path="/character/:id" element={<CharacterDetailPage />} />
         <Route path="/episodes" element={<EpisodesPage />} />
