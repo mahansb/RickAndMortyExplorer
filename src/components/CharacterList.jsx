@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { FaHeart, FaRegHeart } from "react-icons/fa";
-import { showSuccessToast } from "../utils/toastHelpers.js"; // ADD THIS
+import { showSuccessToast } from "../utils/toastHelpers.js";
 
 function CharacterList({ characters, onFavoriteToggle, favorites }) {
   const toggleFavorite = (e, characterId) => {

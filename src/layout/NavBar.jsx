@@ -10,16 +10,12 @@ function NavBar({ searchQuery, setSearchQuery }) {
   const isActive = (path) => location.pathname === path;
 
   const handleNavigationToCharacters = () => {
-    // Clear search when navigating to characters page
     setSearchQuery("");
 
-    // If already on characters page, force a refresh by navigating to a dummy route and back
     if (location.pathname === "/" || location.pathname === "/characters") {
-      // Dispatch a custom event to let CharactersPage know to reset filters
       window.dispatchEvent(new CustomEvent("resetCharactersFilters"));
     }
 
-    // Navigate to characters page
     navigate("/characters");
     setMenuOpen(false);
   };

@@ -19,7 +19,6 @@ function App() {
   return (
     <Layout>
       <NavBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
-      {/* REMOVE Suspense or keep it without fallback to avoid double spinner */}
       <Routes>
         <Route
           path="/"

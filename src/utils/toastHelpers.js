@@ -1,13 +1,11 @@
 import toast from "react-hot-toast";
 
-// Your portal theme colors
 const theme = {
-  success: "#00FFB2", // portal-500
-  error: "#EF4444", // red-500
-  loading: "#A855F7", // alien-500
+  success: "#00FFB2",
+  error: "#EF4444",
+  loading: "#A855F7",
 };
 
-// Rick & Morty flavored error messages
 const getErrorMessage = (error) => {
   const status = error.response?.status;
 
@@ -30,14 +28,13 @@ const getErrorMessage = (error) => {
   }
 };
 
-// Main toast functions you'll use
 export const showErrorToast = (error) => {
   const message = typeof error === "object" ? getErrorMessage(error) : error;
   toast.error(message, {
     duration: 5000,
     style: {
-      background: "#1A2238", // surface-700
-      color: "#E2E8F0", // text-primary
+      background: "#1A2238",
+      color: "#E2E8F0",
       border: "1px solid #EF4444",
       borderRadius: "12px",
       padding: "12px 16px",
@@ -74,7 +71,7 @@ export const showLoadingToast = (message) => {
   });
 };
 
-// Special toast for rate limiting with retry
+// rate limiting
 export const showRateLimitToast = (onRetry) => {
   toast.error("🐉 Portal overloaded! Waiting 3 seconds...", {
     duration: 3000,
@@ -86,13 +83,12 @@ export const showRateLimitToast = (onRetry) => {
     },
   });
 
-  // Auto retry after 3 seconds
   setTimeout(() => {
     if (onRetry) onRetry();
   }, 3000);
 };
 
-// ADD THIS - Info toast for 404s and other non-error notifications
+//404s and other notifs
 export const showInfoToast = (message) => {
   toast(message, {
     duration: 3000,

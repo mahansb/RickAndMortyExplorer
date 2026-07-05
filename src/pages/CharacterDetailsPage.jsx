@@ -66,7 +66,6 @@ function CharacterDetailPage() {
   }, [id]);
 
   const toggleFavorite = () => {
-    // Guard clause - if character doesn't exist, don't try to favorite
     if (!character) return;
 
     const favorites = JSON.parse(localStorage.getItem("favorites") || "[]");
